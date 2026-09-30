@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, 
+initial-scale=1.0">
+
+    <title>Task Manager</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 50px auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 42px;
+            color: #2563eb;
+        }
+
+        .header p {
+            margin-top: 10px;
+            color: #6b7280;
+            font-size: 17px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 15px;
+            margin-bottom: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        button {
+            border: none;
+            border-radius: 9px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        .add-button {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            padding: 13px;
+            font-size: 16px;
+        }
+
+        .task {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 18px;
+            background: #fafafa;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+
+        .task h3 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .description {
+            color: #6b7280;
+            margin: 8px 0 15px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .completed-status {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .pending-status {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .completed-text {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        .edit-button {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .complete-button {
+            background: #22c55e;
+            color: white;
+        }
+
+        .delete-button {
+            background: #ef4444;
+            color: white;
+        }
+
+        .edit-form {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .empty {
+            text-align: center;
+            color: #9ca3af;
+            padding: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .task-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>✨ Task Manager</h1>
+        <p>Organize your tasks and get things done.</p>
+    </div>
+
+
+    <div class="card">
+
+        <h2>➕ Add a new task</h2>
+
+        <form action="/web/tasks" method="post">
+
+            <input
+                type="text"
+                name="title"
+                placeholder="What do you need to do?"
+                required
+            >
+
+            <input
+                type="text"
+                name="description"
+                placeholder="Add a description..."
+            >
+
+            <button class="add-button" type="submit">
+                Add Task
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>📋 My Tasks</h2>
+
+        {% for task in tasks %}
+
+        <div class="task">
+
+            <div class="task-header">
+
+                <h3 class="{% if task[3] %}completed-text{% endif %}">
+                    {{ task[1] }}
+                </h3>
+
+                {% if task[3] %}
+                    <span class="status completed-status">
+                        ✓ Completed
+                    </span>
+                {% else %}
+                    <span class="status pending-status">
+                        ⏳ In progress
+                    </span>
+                {% endif %}
+
+            </div>
+
+
+            {% if task[2] %}
+                <p class="description {% if task[3] %}completed-text{% 
+endif %}">
+                    {{ task[2] }}
+                </p>
+            {% endif %}
+
+
+            <form
+                action="/web/tasks/{{ task[0] }}/update"
+                method="post"
+                class="edit-form"
+            >
+
+                <input
+                    type="text"
+                    name="title"
+                    value="{{ task[1] }}"
+                    required
+                >
+
+                <input
+                    type="text"
+                    name="description"
+                    value="{{ task[2] or '' }}"
+                >
+
+                <button class="edit-button" type="submit">
+                    ✏️ Save Edit
+                </button>
+
+            </form>
+
+
+            <form
+                action="/web/tasks/{{ task[0] }}/complete"
+                method="post"
+                style="display:inline;"
+            >
+
+                <button class="complete-button" type="submit">
+                    {% if task[3] %}
+                        ↩️ Mark Incomplete
+                    {% else %}
+                        ✓ Complete
+                    {% endif %}
+                </button>
+
+            </form>
+
+
+            <form
+                action="/web/tasks/{{ task[0] }}/delete"
+                method="post"
+                style="display:inline;"
+            >
+
+                <button class="delete-button" type="submit">
+                    🗑️ Delete
+                </button>
+
+            </form>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+            <h3>No tasks yet 🎉</h3>
+            <p>Add your first task above.</p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
